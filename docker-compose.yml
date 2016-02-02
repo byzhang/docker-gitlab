@@ -5,29 +5,40 @@ postgresql:
     - DB_USER=gitlab
     - DB_PASS=password
     - DB_NAME=gitlabhq_production
+  ports:
+    - "127.0.0.1:5434:5432"
   volumes:
-    - /srv/docker/gitlab/postgresql:/var/lib/postgresql
+    - /data/srv/docker/gitlab/postgresql:/var/lib/postgresql
 gitlab:
   restart: always
-  image: sameersbn/gitlab:8.4.2
+  image: sameersbn/gitlab:latest
   links:
     - redis:redisio
     - postgresql:postgresql
   ports:
     - "10080:80"
     - "10022:22"
+    - "10443:443"
   environment:
     - DEBUG=false
     - TZ=Asia/Kolkata
-    - GITLAB_TIMEZONE=Kolkata
+    - GITLAB_TIMEZONE=America/Los_Angeles
 
-    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_DB_KEY_BASE=$GITLAB_SECRETS_DB_KEY_BASE
 
-    - GITLAB_HOST=localhost
-    - GITLAB_PORT=10080
+    - OAUTH_ENABLED=true
+    - OAUTH_GITHUB_API_KEY=$OAUTH_GITHUB_API_KEY
+    - OAUTH_GITHUB_APP_SECRET=$OAUTH_GITHUB_APP_SECRET
+
+    - GITLAB_HOST=$GITLAB_HOST
+    - GITLAB_PORT=10443
     - GITLAB_SSH_PORT=10022
     - GITLAB_RELATIVE_URL_ROOT=
 
+    - GITLAB_HTTPS=true
+    - SSL_CERTIFICATE_PATH=/home/git/data/certs/gitlab.crt
+    - SSL_KEY_PATH=/home/git/data/certs/gitlab.key
+    - SSL_DHPARAM_PATH=/home/git/data/certs/dhparam.pem
     - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
     - GITLAB_NOTIFY_PUSHER=false
 
@@ -55,9 +66,9 @@ gitlab:
     - IMAP_SSL=true
     - IMAP_STARTTLS=false
   volumes:
-    - /srv/docker/gitlab/gitlab:/home/git/data
+    - /data/srv/docker/gitlab/gitlab:/home/git/data
 redis:
   restart: always
   image: sameersbn/redis:latest
   volumes:
-    - /srv/docker/gitlab/redis:/var/lib/redis
+    - /data/srv/docker/gitlab/redis:/var/lib/redis
