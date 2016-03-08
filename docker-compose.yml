@@ -5,8 +5,6 @@ postgresql:
     - DB_USER=gitlab
     - DB_PASS=password
     - DB_NAME=gitlabhq_production
-  ports:
-    - "127.0.0.1:5434:5432"
   volumes:
     - /data/srv/docker/gitlab/postgresql:/var/lib/postgresql
 gitlab:
@@ -16,7 +14,6 @@ gitlab:
     - redis:redisio
     - postgresql:postgresql
   ports:
-    - "10080:80"
     - "10022:22"
     - "10443:443"
   environment:
